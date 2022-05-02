@@ -2,8 +2,8 @@
 set -Eeuo pipefail
 
 # TODO http://distro.ibiblio.org/tinycorelinux/latest-x86_64
-major='11.x'
-version='11.0' # TODO auto-detect latest
+major='13.x'
+version='13.0' # TODO auto-detect latest
 # 9.x doesn't seem to use ".../archive/X.Y.Z/..." in the same way as 8.x :(
 
 mirrors=(
@@ -12,10 +12,10 @@ mirrors=(
 )
 
 # https://www.kernel.org/
-kernelBase='4.19'
+kernelBase='5.17'
 # https://github.com/boot2docker/boot2docker/issues/1398
 # https://download.virtualbox.org/virtualbox/
-vboxBase='5'
+vboxBase='6'
 
 # avoid issues with slow Git HTTP interactions (*cough* sourceforge *cough*)
 export GIT_HTTP_LOW_SPEED_LIMIT='100'
