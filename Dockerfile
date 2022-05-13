@@ -25,6 +25,7 @@ RUN apt-get update; \
 		wget \
 		xorriso \
 		xz-utils \
+		rsync \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
@@ -37,12 +38,12 @@ WORKDIR /rootfs
 
 # updated via "update.sh"
 ENV TCL_MIRRORS http://distro.ibiblio.org/tinycorelinux http://repo.tinycorelinux.net
-ENV TCL_MAJOR 13.x
-ENV TCL_VERSION 13.0
+ENV TCL_MAJOR 11.x
+ENV TCL_VERSION 11.0
 
 # http://distro.ibiblio.org/tinycorelinux/8.x/x86_64/archive/8.2.1/distribution_files/rootfs64.gz.md5.txt
 # updated via "update.sh"
-ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="91caf2cb61b38b3e3ef3be4d8f6f8701"
+ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="ea8699a39115289ed00d807eac4c3118"
 
 COPY files/tce-load.patch files/udhcpc.patch /tcl-patches/
 
@@ -178,7 +179,7 @@ ENV LINUX_GPG_KEYS \
 		647F28654894E3BD457199BE38DBBDC86092693E
 
 # updated via "update.sh"
-ENV LINUX_VERSION 5.17.5
+ENV LINUX_VERSION 4.19.242
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -357,45 +358,6 @@ RUN make -C /usr/src/vbox/amd64/src/vboxguest -j "$(nproc)" \
 	ln -sT lib lib64; \
 	cp -v /usr/src/vbox/amd64/other/mount.vboxsf /usr/src/vbox/amd64/sbin/VBoxService sbin/; \
 	cp -v /usr/src/vbox/amd64/bin/VBoxControl bin/
-
-# TCL includes VMware's open-vm-tools 10.2.0.1608+ (no reason to compile that ourselves)
-RUN tcl-tce-load open-vm-tools; \
-	tcl-chroot vmhgfs-fuse --version; \
-	tcl-chroot vmtoolsd --version
-
-ENV PARALLELS_VERSION 13.3.0-43321
-
-RUN wget -O /parallels.tgz "https://download.parallels.com/desktop/v${PARALLELS_VERSION%%.*}/$PARALLELS_VERSION/ParallelsTools-$PARALLELS_VERSION-boot2docker.tar.gz"; \
-	mkdir /usr/src/parallels; \
-	tar --extract --file /parallels.tgz --directory /usr/src/parallels --strip-components 1; \
-	rm /parallels.tgz
-RUN cp -vr /usr/src/parallels/tools/* ./; \
-	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" installme \
-		SRC='/usr/src/linux' \
-		KERNEL_DIR='/usr/src/linux' \
-		KVER="$(< /usr/src/linux/include/config/kernel.release)" \
-		PRL_FREEZE_SKIP=1 \
-	; \
-	find /usr/src/parallels/kmods -name '*.ko' -exec cp -v '{}' lib/modules/*/ ';'; \
-	tcl-chroot prltoolsd -V
-
-# https://github.com/xenserver/xe-guest-utilities/tags
-# updated via "update.sh"
-ENV XEN_VERSION 7.30.0
-
-RUN wget -O /xen.tgz "https://github.com/xenserver/xe-guest-utilities/archive/v$XEN_VERSION.tar.gz"; \
-	mkdir /usr/src/xen; \
-	tar --extract --file /xen.tgz --directory /usr/src/xen --strip-components 1; \
-	rm /xen.tgz
-# download "golang.org/x/sys/unix" dependency (new in 7.14.0)
-RUN cd /usr/src/xen; \
-	mkdir -p GOPATH/src/golang.org/x/sys; \
-	wget -O sys.tgz 'https://github.com/golang/sys/archive/fc99dfbffb4e5ed5758a37e31dd861afe285406b.tar.gz'; \
-	tar -xf sys.tgz -C GOPATH/src/golang.org/x/sys --strip-components 1; \
-	rm sys.tgz
-RUN GOPATH='/usr/src/xen/GOPATH' make -C /usr/src/xen -j "$(nproc)" PRODUCT_VERSION="$XEN_VERSION" RELEASE='boot2docker'; \
-	tar --extract --file "/usr/src/xen/build/dist/xe-guest-utilities_$XEN_VERSION-boot2docker_x86_64.tgz"; \
-	tcl-chroot xenstore || [ "$?" = 1 ]
 
 # Hyper-V KVP Daemon
 RUN make -C /usr/src/linux/tools/hv hv_kvp_daemon; \
