@@ -232,8 +232,8 @@ RUN setConfs="$(grep -vEh '^[#-]' /kernel-config.d/* | sort -u)"; \
 	\
 	make -C /usr/src/linux \
 		defconfig \
-		kvmconfig \
-		xenconfig \
+		kvm_guest.config \
+		xen.config \
 		> /dev/null; \
 	\
 	( \
