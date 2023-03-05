@@ -36,11 +36,11 @@ RUN echo 'progress = dot:giga' >> ~/.wgetrc; \
 WORKDIR /rootfs
 
 # updated via "update.sh"
-ENV TCL_MIRRORS http://distro.ibiblio.org/tinycorelinux http://repo.tinycorelinux.net
+ENV TCL_MIRRORS https://distro.ibiblio.org/tinycorelinux http://repo.tinycorelinux.net
 ENV TCL_MAJOR 10.x
 ENV TCL_VERSION 10.1
 
-# http://distro.ibiblio.org/tinycorelinux/8.x/x86_64/archive/8.2.1/distribution_files/rootfs64.gz.md5.txt
+# https://distro.ibiblio.org/tinycorelinux/13.x/x86_64/release/distribution_files/rootfs64.gz.md5.txt
 # updated via "update.sh"
 ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="ec65d3b2bbb64f62a171f60439c84127"
 
@@ -311,7 +311,7 @@ RUN echo 'for i in /usr/local/etc/profile.d/*.sh ; do if [ -r "$i" ]; then . $i;
 # install kernel headers so we can use them for building xen-utils, etc
 RUN make -C /usr/src/linux INSTALL_HDR_PATH=/usr/local headers_install
 
-# http://download.virtualbox.org/virtualbox/
+# https://download.virtualbox.org/virtualbox/
 # updated via "update.sh"
 ENV VBOX_VERSION 5.2.34
 # https://www.virtualbox.org/download/hashes/$VBOX_VERSION/SHA256SUMS
