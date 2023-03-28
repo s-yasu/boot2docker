@@ -25,6 +25,7 @@ RUN apt-get update; \
 		wget \
 		xorriso \
 		xz-utils \
+		rsync \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
