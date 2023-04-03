@@ -344,7 +344,7 @@ RUN tcl-tce-load open-vm-tools; \
 	tcl-chroot vmhgfs-fuse --version; \
 	tcl-chroot vmtoolsd --version
 
-ENV PARALLELS_VERSION 13.3.0-43321
+ENV PARALLELS_VERSION 18.2.0-53488
 
 RUN wget -O /parallels.tgz "https://download.parallels.com/desktop/v${PARALLELS_VERSION%%.*}/$PARALLELS_VERSION/ParallelsTools-$PARALLELS_VERSION-boot2docker.tar.gz"; \
 	mkdir /usr/src/parallels; \
