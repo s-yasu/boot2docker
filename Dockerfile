@@ -25,6 +25,7 @@ RUN apt-get update; \
 		wget \
 		xorriso \
 		xz-utils \
+		rsync \
 	; \
 	rm -rf /var/lib/apt/lists/*
 
@@ -37,12 +38,12 @@ WORKDIR /rootfs
 
 # updated via "update.sh"
 ENV TCL_MIRRORS https://distro.ibiblio.org/tinycorelinux http://repo.tinycorelinux.net
-ENV TCL_MAJOR 10.x
-ENV TCL_VERSION 10.1
+ENV TCL_MAJOR 13.x
+ENV TCL_VERSION 13.1
 
 # https://distro.ibiblio.org/tinycorelinux/13.x/x86_64/release/distribution_files/rootfs64.gz.md5.txt
 # updated via "update.sh"
-ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="ec65d3b2bbb64f62a171f60439c84127"
+ENV TCL_ROOTFS="rootfs64.gz" TCL_ROOTFS_MD5="337441ac3eb75561a9d702d783e678ba"
 
 COPY files/tce-load.patch files/udhcpc.patch /tcl-patches/
 
@@ -171,7 +172,7 @@ RUN tcl-tce-load bash; \
 	[ "$PS1" = '\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ ' ]
 
 # updated via "update.sh"
-ENV LINUX_VERSION 4.19.130
+ENV LINUX_VERSION 5.15.10
 
 RUN wget -O /linux.tar.xz "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.xz"; \
 	wget -O /linux.tar.asc "https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/linux-${LINUX_VERSION}.tar.sign"; \
@@ -232,8 +233,8 @@ RUN setConfs="$(grep -vEh '^[#-]' /kernel-config.d/* | sort -u)"; \
 	\
 	make -C /usr/src/linux \
 		defconfig \
-		kvmconfig \
-		xenconfig \
+		kvm_guest.config \
+		xen.config \
 		> /dev/null; \
 	\
 	( \
@@ -289,10 +290,10 @@ RUN tcl-tce-load \
 		git \
 		iproute2 \
 		iptables \
-		ncurses-terminfo \
+		ncursesw-terminfo \
 		nfs-utils \
 		openssh \
-		openssl \
+		openssl-1.1.1 \
 		parted \
 		procps-ng \
 		rsync \
@@ -313,9 +314,9 @@ RUN make -C /usr/src/linux INSTALL_HDR_PATH=/usr/local headers_install
 
 # https://download.virtualbox.org/virtualbox/
 # updated via "update.sh"
-ENV VBOX_VERSION 5.2.34
+ENV VBOX_VERSION 7.0.8
 # https://www.virtualbox.org/download/hashes/$VBOX_VERSION/SHA256SUMS
-ENV VBOX_SHA256 d1b63891abca37fd78f5c8af1764e10e5754b1eecabd1fcfe7599c29a93ba007
+ENV VBOX_SHA256 8d73e2361afbf696e6128ffa5e96d9f6a78ff32cb2cb54c727a5be7992be0b31
 # (VBoxGuestAdditions_X.Y.Z.iso SHA256, for verification)
 
 RUN wget -O /vbox.iso "https://download.virtualbox.org/virtualbox/$VBOX_VERSION/VBoxGuestAdditions_$VBOX_VERSION.iso"; \
@@ -343,14 +344,25 @@ RUN tcl-tce-load open-vm-tools; \
 	tcl-chroot vmhgfs-fuse --version; \
 	tcl-chroot vmtoolsd --version
 
-ENV PARALLELS_VERSION 13.3.0-43321
+ENV PARALLELS_VERSION 18.2.0-53488
+
+COPY files/parallels.patch /parallels-patches/
 
 RUN wget -O /parallels.tgz "https://download.parallels.com/desktop/v${PARALLELS_VERSION%%.*}/$PARALLELS_VERSION/ParallelsTools-$PARALLELS_VERSION-boot2docker.tar.gz"; \
 	mkdir /usr/src/parallels; \
 	tar --extract --file /parallels.tgz --directory /usr/src/parallels --strip-components 1; \
-	rm /parallels.tgz
+	rm /parallels.tgz; \
+	\
+	for patch in /parallels-patches/*.patch; do \
+		patch \
+			--directory /usr/src/parallels \
+			--input "$patch" \
+			--strip 1 \
+			--verbose \
+		; \
+	done;
 RUN cp -vr /usr/src/parallels/tools/* ./; \
-	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" installme \
+	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" \
 		SRC='/usr/src/linux' \
 		KERNEL_DIR='/usr/src/linux' \
 		KVER="$(< /usr/src/linux/include/config/kernel.release)" \
