@@ -1,0 +1,28 @@
+Description: use dev for PCI devices
+Author: YASUSHIMA Satoshi
+
+diff -u a/kmods/prl_vid/Video/Guest/Linux/kmod/prldrm.c b/kmods/prl_vid/Video/Guest/Linux/kmod/prldrm.c
+--- a/kmods/prl_vid/Video/Guest/Linux/kmod/prldrm.c
++++ b/kmods/prl_vid/Video/Guest/Linux/kmod/prldrm.c
+@@ -1543,9 +1543,9 @@
+ {
+ 	DRM_DEBUG_DRIVER(PFX_FMT "pci:0000:%02x:%02x.%d",
+ 		PFX_ARG,
+-		dev->pdev->bus->number,
+-		PCI_SLOT(dev->pdev->devfn),
+-		PCI_FUNC(dev->pdev->devfn));
++		(struct pci_dev *)(dev->dev)->bus->number,
++		PCI_SLOT((struct pci_dev *)(dev->dev)->devfn),
++		PCI_FUNC((struct pci_dev *)(dev->dev)->devfn));
+ 	return drm_pci_set_busid(dev, master);
+ }
+ #endif
+@@ -2593,7 +2593,7 @@
+ 		DRM_ERROR(PFX_FMT "Failed allocating a drm device.", PFX_ARG);
+ 		return PTR_ERR(dev);
+ 	}
+-	dev->pdev = pdev;
++	dev->dev = (struct device *)pdev;
+ 
+ 	prl_dev = kzalloc(sizeof(*prl_dev), GFP_KERNEL);
+ 	if (unlikely(!prl_dev)) {

@@ -344,14 +344,25 @@ RUN tcl-tce-load open-vm-tools; \
 	tcl-chroot vmhgfs-fuse --version; \
 	tcl-chroot vmtoolsd --version
 
-ENV PARALLELS_VERSION 13.3.0-43321
+ENV PARALLELS_VERSION 18.2.0-53488
+
+COPY files/parallels.patch /parallels-patches/
 
 RUN wget -O /parallels.tgz "https://download.parallels.com/desktop/v${PARALLELS_VERSION%%.*}/$PARALLELS_VERSION/ParallelsTools-$PARALLELS_VERSION-boot2docker.tar.gz"; \
 	mkdir /usr/src/parallels; \
 	tar --extract --file /parallels.tgz --directory /usr/src/parallels --strip-components 1; \
-	rm /parallels.tgz
+	rm /parallels.tgz; \
+	\
+	for patch in /parallels-patches/*.patch; do \
+		patch \
+			--directory /usr/src/parallels \
+			--input "$patch" \
+			--strip 1 \
+			--verbose \
+		; \
+	done;
 RUN cp -vr /usr/src/parallels/tools/* ./; \
-	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" installme \
+	make -C /usr/src/parallels/kmods -f Makefile.kmods -j "$(nproc)" \
 		SRC='/usr/src/linux' \
 		KERNEL_DIR='/usr/src/linux' \
 		KVER="$(< /usr/src/linux/include/config/kernel.release)" \
