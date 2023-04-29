@@ -34,7 +34,7 @@ mkdir -p /tmp/stats
 {
 	echo "- Docker [v$DOCKER_VERSION](https://github.com/docker/docker-ce/releases/tag/v$DOCKER_VERSION)"
 
-	echo "- Linux [v$LINUX_VERSION](https://cdn.kernel.org/pub/linux/kernel/v4.x/ChangeLog-$LINUX_VERSION)"
+	echo "- Linux [v$LINUX_VERSION](https://cdn.kernel.org/pub/linux/kernel/v${LINUX_VERSION%%.*}.x/ChangeLog-$LINUX_VERSION)"
 
 	echo "- Tiny Core Linux [v$TCL_VERSION](https://forum.tinycorelinux.net/index.php?board=31.0)"
 
