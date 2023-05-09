@@ -2,8 +2,8 @@
 set -Eeuo pipefail
 
 # TODO https://distro.ibiblio.org/tinycorelinux/latest-x86_64
-major='13.x'
-version='13.1' # TODO auto-detect latest
+major='14.x'
+version='14.0' # TODO auto-detect latest
 # 9.x doesn't seem to use ".../archive/X.Y.Z/..." in the same way as 8.x :(
 
 mirrors=(
@@ -12,7 +12,7 @@ mirrors=(
 )
 
 # https://www.kernel.org/
-kernelBase='5.15'
+kernelBase='6.1'
 # https://download.virtualbox.org/virtualbox/
 vboxBase='7'
 
