@@ -15,7 +15,7 @@ Boot2Docker is a lightweight Linux distribution made specifically to run
 ## Features
 
 * Recent Linux Kernel, Docker pre-installed and ready-to-use
-* VM guest additions (VirtualBox, Parallels, VMware, XenServer)
+* VM guest additions (VirtualBox, VMware, XenServer)
 * Container persistence via disk automount on `/var/lib/docker`
 * SSH keys persistence via disk automount
 

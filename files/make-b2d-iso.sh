@@ -38,8 +38,6 @@ mkdir -p /tmp/stats
 
 	echo "- Tiny Core Linux [v$TCL_VERSION](https://forum.tinycorelinux.net/index.php?board=31.0)"
 
-	echo "- Parallels Tools v$PARALLELS_VERSION" # https://github.com/boot2docker/boot2docker/pull/1332#issuecomment-420273330
-
 	ovtVersion="$(tcl-chroot vmtoolsd --version | grep -oE 'version [^ ]+' | cut -d' ' -f2)"
 	echo "- VMware Tools (\`open-vm-tools\`) [v$ovtVersion](https://distro.ibiblio.org/tinycorelinux/$TCL_MAJOR/x86_64/tcz/open-vm-tools.tcz.info)"
 
