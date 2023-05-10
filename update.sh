@@ -84,8 +84,6 @@ seds+=(
 	-e 's!^(ENV VBOX_SHA256).*!\1 '"$vboxSha256"'!'
 )
 
-# PARALLELS_VERSION: https://github.com/boot2docker/boot2docker/pull/1332#issuecomment-420273330
-
 # TODO figure out what's up with 7.14.0 and why it fails to build
 xenVersion="$(
 	git ls-remote --tags 'https://github.com/xenserver/xe-guest-utilities.git' \
