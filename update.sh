@@ -12,7 +12,7 @@ mirrors=(
 )
 
 # https://www.kernel.org/
-kernelBase='5.15'
+kernelBase='5.0'
 # https://download.virtualbox.org/virtualbox/
 vboxBase='7'
 
